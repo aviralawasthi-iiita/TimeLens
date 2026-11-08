@@ -1,0 +1,47 @@
+# Levers for the order_fulfilment example. Every number here is an ASSUMPTION.
+currency: INR
+assumption_note: "All costs and lever limits are illustrative assumptions, not real shop data."
+granularity: 1h            # round repairs to this step
+levers:
+  - id: express_supplier
+    label: "Pay the supplier for express shipping"
+    param: Task_Supplier.max
+    direction: decrease
+    cost_per_day: 8000
+    max_change: 3d
+  - id: inspection_shift
+    label: "Add an inspection shift"
+    param: Task_Inspect.max
+    direction: decrease
+    cost_per_day: 6000
+    max_change: 20h
+  - id: express_courier
+    label: "Use an express domestic courier"
+    param: Task_Domestic.max
+    direction: decrease
+    cost_per_day: 5000
+    max_change: 2d
+  - id: priority_broker
+    label: "Pay a customs broker for priority filing"
+    param: Task_Customs.max
+    direction: decrease
+    cost_per_day: 4000
+    max_change: 1d
+  - id: air_freight
+    label: "Ship by air freight"
+    param: Task_Ship.max
+    direction: decrease
+    cost_per_day: 12000
+    max_change: 5d
+  - id: reauthorise
+    label: "Authorise the card again before it expires"
+    param: L_auth_expiry.max
+    direction: increase
+    cost_per_day: 3000
+    max_change: 7d
+  - id: later_promise
+    label: "Promise a later international delivery date (lost sales)"
+    param: C_international.max
+    direction: increase
+    cost_per_day: 15000
+    max_change: 7d

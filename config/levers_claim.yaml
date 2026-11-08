@@ -1,0 +1,29 @@
+# Levers for the claim_full example. Every number here is an ASSUMPTION.
+currency: INR
+assumption_note: "All costs and lever limits are illustrative assumptions, not real insurer data."
+granularity: 1h            # round repairs to this step
+levers:
+  - id: remind_customer
+    label: "Send document reminders to the customer"
+    param: Task_Documents.max
+    direction: decrease
+    cost_per_day: 30000
+    max_change: 5d
+  - id: add_adjuster
+    label: "Book an extra loss adjuster"
+    param: Task_Survey.max
+    direction: decrease
+    cost_per_day: 20000
+    max_change: 2d
+  - id: extra_committee
+    label: "Hold an extra committee sitting"
+    param: Task_Committee.max
+    direction: decrease
+    cost_per_day: 25000
+    max_change: 2d
+  - id: extend_decision
+    label: "Extend the decision deadline (regulatory penalty)"
+    param: C_decision.max
+    direction: increase
+    cost_per_day: 60000
+    max_change: 7d
