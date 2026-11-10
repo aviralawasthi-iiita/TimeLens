@@ -1,0 +1,72 @@
+{
+  "process_id": "claim_full",
+  "notes": "Illustrative insurance claim. Every duration and deadline is an assumption.",
+  "xor_outcome_known_at": "start",
+  "tasks": {
+    "Task_Register":    {"kind": "contingent",   "owner": "staff",         "min": "30m", "max": "4h"},
+    "Task_Acknowledge": {"kind": "controllable", "owner": "system",        "min": "5m",  "max": "1h"},
+    "Task_Documents":   {"kind": "contingent",   "owner": "customer",      "min": "1d",  "max": "10d"},
+    "Task_DocCheck":    {"kind": "contingent",   "owner": "staff",         "min": "2h",  "max": "1d"},
+    "Task_PolicyCheck": {"kind": "contingent",   "owner": "staff",         "min": "1h",  "max": "1d"},
+    "Task_FraudScreen": {"kind": "contingent",   "owner": "system",        "min": "10m", "max": "4h"},
+    "Task_FastTrack":   {"kind": "contingent",   "owner": "staff",         "min": "2h",  "max": "1d"},
+    "Task_Survey":      {"kind": "contingent",   "owner": "loss adjuster", "min": "1d",  "max": "5d"},
+    "Task_Committee":   {"kind": "contingent",   "owner": "committee",     "min": "1d",  "max": "3d"},
+    "Task_Payment":     {"kind": "contingent",   "owner": "bank",          "min": "1d",  "max": "3d"}
+  },
+  "constraints": [
+    {
+      "id": "C_ack",
+      "type": "deadline",
+      "label": "Acknowledge within 1 day of receipt",
+      "from": {"element": "StartEvent_1", "point": "start"},
+      "to":   {"element": "Task_Acknowledge", "point": "end"},
+      "max": "1d"
+    },
+    {
+      "id": "C_decision",
+      "type": "deadline",
+      "label": "Decision within 14 days of receipt",
+      "from": {"element": "StartEvent_1", "point": "start"},
+      "to":   {"element": "Event_Decision", "point": "start"},
+      "max": "14d"
+    },
+    {
+      "id": "C_close",
+      "type": "deadline",
+      "label": "Claim closed within 30 days of receipt",
+      "from": {"element": "StartEvent_1", "point": "start"},
+      "to":   {"element": "EndEvent_1", "point": "end"},
+      "max": "30d"
+    },
+    {
+      "id": "L_cooling_off",
+      "type": "lag",
+      "label": "Payment starts 1 to 2 days after the decision",
+      "from": {"element": "Event_Decision", "point": "start"},
+      "to":   {"element": "Task_Payment", "point": "start"},
+      "min": "1d",
+      "max": "2d"
+    },
+    {
+      "id": "L_payment",
+      "type": "lag",
+      "label": "Paid within 5 days of the decision",
+      "from": {"element": "Event_Decision", "point": "start"},
+      "to":   {"element": "Task_Payment", "point": "end"},
+      "max": "5d"
+    },
+    {
+      "id": "L_fraud_first",
+      "type": "lag",
+      "label": "Documents checked only after fraud screening",
+      "from": {"element": "Task_FraudScreen", "point": "end"},
+      "to":   {"element": "Task_DocCheck", "point": "start"},
+      "min": "0"
+    }
+  ],
+  "flow_gaps": [
+    {"flow": "Flow_5",  "min": "0",  "max": "1d"},
+    {"flow": "Flow_15", "min": "4h", "max": "2d"}
+  ]
+}

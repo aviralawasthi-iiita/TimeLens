@@ -1,0 +1,85 @@
+{
+  "process_id": "order_fulfilment",
+  "notes": "Illustrative cross-border web shop. Every duration and deadline is an assumption. Stock and destination are known when the order is placed.",
+  "xor_outcome_known_at": "start",
+  "tasks": {
+    "Task_Authorise":   {"kind": "contingent",   "owner": "card network",      "min": "1m",  "max": "30m"},
+    "Task_Invoice":     {"kind": "controllable", "owner": "system",            "min": "1m",  "max": "10m"},
+    "Task_Fraud":       {"kind": "contingent",   "owner": "risk team",         "min": "10m", "max": "1d"},
+    "Task_Pick":        {"kind": "contingent",   "owner": "warehouse",         "min": "30m", "max": "8h"},
+    "Task_Supplier":    {"kind": "contingent",   "owner": "supplier",          "min": "2d",  "max": "6d"},
+    "Task_NotifyDelay": {"kind": "controllable", "owner": "system",            "min": "1m",  "max": "15m"},
+    "Task_Inspect":     {"kind": "contingent",   "owner": "warehouse",         "min": "1h",  "max": "1d"},
+    "Task_Pack":        {"kind": "contingent",   "owner": "warehouse",         "min": "15m", "max": "2h"},
+    "Task_Capture":     {"kind": "contingent",   "owner": "card network",      "min": "1m",  "max": "1h"},
+    "Task_Label":       {"kind": "controllable", "owner": "system",            "min": "1m",  "max": "10m"},
+    "Task_Domestic":    {"kind": "contingent",   "owner": "courier",           "min": "1d",  "max": "3d"},
+    "Task_Customs":     {"kind": "contingent",   "owner": "customs broker",    "min": "2h",  "max": "2d"},
+    "Task_Export":      {"kind": "contingent",   "owner": "compliance",        "min": "1h",  "max": "1d"},
+    "Task_Ship":        {"kind": "contingent",   "owner": "carrier",           "min": "3d",  "max": "8d"},
+    "Task_Clearance":   {"kind": "contingent",   "owner": "customs authority", "min": "4h",  "max": "3d"},
+    "Task_Review":      {"kind": "controllable", "owner": "system",            "min": "1m",  "max": "5m"}
+  },
+  "constraints": [
+    {
+      "id": "C_notify",
+      "type": "deadline",
+      "label": "Tell the customer about a backorder within 4 hours of the order",
+      "from": {"element": "StartEvent_1", "point": "start"},
+      "to":   {"element": "Task_NotifyDelay", "point": "end"},
+      "max": "4h"
+    },
+    {
+      "id": "L_pick_start",
+      "type": "lag",
+      "label": "Start picking within 2 hours of the payment authorisation",
+      "from": {"element": "Task_Authorise", "point": "end"},
+      "to":   {"element": "Task_Pick", "point": "start"},
+      "max": "2h"
+    },
+    {
+      "id": "L_fraud_first",
+      "type": "lag",
+      "label": "Pack only after the fraud review ends",
+      "from": {"element": "Task_Fraud", "point": "end"},
+      "to":   {"element": "Task_Pack", "point": "start"},
+      "min": "0"
+    },
+    {
+      "id": "L_auth_expiry",
+      "type": "lag",
+      "label": "Capture the payment within 7 days of authorisation (the authorisation expires)",
+      "from": {"element": "Task_Authorise", "point": "end"},
+      "to":   {"element": "Task_Capture", "point": "start"},
+      "max": "7d"
+    },
+    {
+      "id": "C_domestic",
+      "type": "deadline",
+      "label": "Deliver domestic orders within 10 days",
+      "from": {"element": "StartEvent_1", "point": "start"},
+      "to":   {"element": "Task_Domestic", "point": "end"},
+      "max": "10d"
+    },
+    {
+      "id": "C_international",
+      "type": "deadline",
+      "label": "Deliver international orders within 18 days",
+      "from": {"element": "StartEvent_1", "point": "start"},
+      "to":   {"element": "Task_Clearance", "point": "end"},
+      "max": "18d"
+    },
+    {
+      "id": "C_close",
+      "type": "deadline",
+      "label": "Close the order within 30 days",
+      "from": {"element": "StartEvent_1", "point": "start"},
+      "to":   {"element": "EndEvent_1", "point": "end"},
+      "max": "30d"
+    }
+  ],
+  "flow_gaps": [
+    {"flow": "Flow_29", "min": "4h", "max": "2d"},
+    {"flow": "Flow_33", "min": "2d", "max": "3d"}
+  ]
+}

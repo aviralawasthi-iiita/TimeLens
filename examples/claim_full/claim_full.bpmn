@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_claim_full" targetNamespace="http://bpmn.io/schema/bpmn">
+  <bpmn:process id="claim_full" isExecutable="false">
+    <bpmn:startEvent id="StartEvent_1" name="Claim received">
+      <bpmn:outgoing>Flow_1</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="Task_Register" name="Register claim">
+      <bpmn:incoming>Flow_1</bpmn:incoming>
+      <bpmn:outgoing>Flow_2</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="Task_Acknowledge" name="Send acknowledgement">
+      <bpmn:incoming>Flow_2</bpmn:incoming>
+      <bpmn:outgoing>Flow_3</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:parallelGateway id="Gateway_AND_split">
+      <bpmn:incoming>Flow_3</bpmn:incoming>
+      <bpmn:outgoing>Flow_4</bpmn:outgoing>
+      <bpmn:outgoing>Flow_7</bpmn:outgoing>
+      <bpmn:outgoing>Flow_9</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:receiveTask id="Task_Documents" name="Customer sends documents">
+      <bpmn:incoming>Flow_4</bpmn:incoming>
+      <bpmn:outgoing>Flow_5</bpmn:outgoing>
+    </bpmn:receiveTask>
+    <bpmn:userTask id="Task_DocCheck" name="Check documents">
+      <bpmn:incoming>Flow_5</bpmn:incoming>
+      <bpmn:outgoing>Flow_6</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="Task_PolicyCheck" name="Check policy coverage">
+      <bpmn:incoming>Flow_7</bpmn:incoming>
+      <bpmn:outgoing>Flow_8</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="Task_FraudScreen" name="Fraud screening">
+      <bpmn:incoming>Flow_9</bpmn:incoming>
+      <bpmn:outgoing>Flow_10</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:parallelGateway id="Gateway_AND_join">
+      <bpmn:incoming>Flow_6</bpmn:incoming>
+      <bpmn:incoming>Flow_8</bpmn:incoming>
+      <bpmn:incoming>Flow_10</bpmn:incoming>
+      <bpmn:outgoing>Flow_11</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:exclusiveGateway id="Gateway_XOR_split" name="Claim size?">
+      <bpmn:incoming>Flow_11</bpmn:incoming>
+      <bpmn:outgoing>Flow_12</bpmn:outgoing>
+      <bpmn:outgoing>Flow_14</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="Task_FastTrack" name="Fast-track assessment">
+      <bpmn:incoming>Flow_12</bpmn:incoming>
+      <bpmn:outgoing>Flow_13</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="Task_Survey" name="Site survey by loss adjuster">
+      <bpmn:incoming>Flow_14</bpmn:incoming>
+      <bpmn:outgoing>Flow_15</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="Task_Committee" name="Claims committee review">
+      <bpmn:incoming>Flow_15</bpmn:incoming>
+      <bpmn:outgoing>Flow_16</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="Gateway_XOR_join">
+      <bpmn:incoming>Flow_13</bpmn:incoming>
+      <bpmn:incoming>Flow_16</bpmn:incoming>
+      <bpmn:outgoing>Flow_17</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:intermediateThrowEvent id="Event_Decision" name="Decision made">
+      <bpmn:incoming>Flow_17</bpmn:incoming>
+      <bpmn:outgoing>Flow_18</bpmn:outgoing>
+    </bpmn:intermediateThrowEvent>
+    <bpmn:serviceTask id="Task_Payment" name="Pay settlement">
+      <bpmn:incoming>Flow_18</bpmn:incoming>
+      <bpmn:outgoing>Flow_19</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="EndEvent_1" name="Claim closed">
+      <bpmn:incoming>Flow_19</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_1" sourceRef="StartEvent_1" targetRef="Task_Register" />
+    <bpmn:sequenceFlow id="Flow_2" sourceRef="Task_Register" targetRef="Task_Acknowledge" />
+    <bpmn:sequenceFlow id="Flow_3" sourceRef="Task_Acknowledge" targetRef="Gateway_AND_split" />
+    <bpmn:sequenceFlow id="Flow_4" sourceRef="Gateway_AND_split" targetRef="Task_Documents" />
+    <bpmn:sequenceFlow id="Flow_5" sourceRef="Task_Documents" targetRef="Task_DocCheck" />
+    <bpmn:sequenceFlow id="Flow_6" sourceRef="Task_DocCheck" targetRef="Gateway_AND_join" />
+    <bpmn:sequenceFlow id="Flow_7" sourceRef="Gateway_AND_split" targetRef="Task_PolicyCheck" />
+    <bpmn:sequenceFlow id="Flow_8" sourceRef="Task_PolicyCheck" targetRef="Gateway_AND_join" />
+    <bpmn:sequenceFlow id="Flow_9" sourceRef="Gateway_AND_split" targetRef="Task_FraudScreen" />
+    <bpmn:sequenceFlow id="Flow_10" sourceRef="Task_FraudScreen" targetRef="Gateway_AND_join" />
+    <bpmn:sequenceFlow id="Flow_11" sourceRef="Gateway_AND_join" targetRef="Gateway_XOR_split" />
+    <bpmn:sequenceFlow id="Flow_12" name="Small claim" sourceRef="Gateway_XOR_split" targetRef="Task_FastTrack" />
+    <bpmn:sequenceFlow id="Flow_13" sourceRef="Task_FastTrack" targetRef="Gateway_XOR_join" />
+    <bpmn:sequenceFlow id="Flow_14" name="Large claim" sourceRef="Gateway_XOR_split" targetRef="Task_Survey" />
+    <bpmn:sequenceFlow id="Flow_15" sourceRef="Task_Survey" targetRef="Task_Committee" />
+    <bpmn:sequenceFlow id="Flow_16" sourceRef="Task_Committee" targetRef="Gateway_XOR_join" />
+    <bpmn:sequenceFlow id="Flow_17" sourceRef="Gateway_XOR_join" targetRef="Event_Decision" />
+    <bpmn:sequenceFlow id="Flow_18" sourceRef="Event_Decision" targetRef="Task_Payment" />
+    <bpmn:sequenceFlow id="Flow_19" sourceRef="Task_Payment" targetRef="EndEvent_1" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_claim_full">
+    <bpmndi:BPMNPlane id="BPMNPlane_claim_full" bpmnElement="claim_full">
+      <bpmndi:BPMNShape id="StartEvent_1_di" bpmnElement="StartEvent_1">
+        <dc:Bounds x="100" y="182" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Register_di" bpmnElement="Task_Register">
+        <dc:Bounds x="170" y="160" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Acknowledge_di" bpmnElement="Task_Acknowledge">
+        <dc:Bounds x="310" y="160" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_AND_split_di" bpmnElement="Gateway_AND_split">
+        <dc:Bounds x="455" y="175" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Documents_di" bpmnElement="Task_Documents">
+        <dc:Bounds x="540" y="40" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_DocCheck_di" bpmnElement="Task_DocCheck">
+        <dc:Bounds x="690" y="40" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_PolicyCheck_di" bpmnElement="Task_PolicyCheck">
+        <dc:Bounds x="615" y="160" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_FraudScreen_di" bpmnElement="Task_FraudScreen">
+        <dc:Bounds x="615" y="280" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_AND_join_di" bpmnElement="Gateway_AND_join">
+        <dc:Bounds x="845" y="175" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_XOR_split_di" bpmnElement="Gateway_XOR_split" isMarkerVisible="true">
+        <dc:Bounds x="935" y="175" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="980" y="225" width="58" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_FastTrack_di" bpmnElement="Task_FastTrack">
+        <dc:Bounds x="1030" y="60" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Survey_di" bpmnElement="Task_Survey">
+        <dc:Bounds x="1030" y="260" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Committee_di" bpmnElement="Task_Committee">
+        <dc:Bounds x="1180" y="260" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_XOR_join_di" bpmnElement="Gateway_XOR_join" isMarkerVisible="true">
+        <dc:Bounds x="1335" y="175" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_Decision_di" bpmnElement="Event_Decision">
+        <dc:Bounds x="1427" y="182" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1410" y="225" width="70" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Payment_di" bpmnElement="Task_Payment">
+        <dc:Bounds x="1500" y="160" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_1_di" bpmnElement="EndEvent_1">
+        <dc:Bounds x="1652" y="182" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1638" y="225" width="64" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1_di" bpmnElement="Flow_1">
+        <di:waypoint x="136" y="200" />
+        <di:waypoint x="170" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_2_di" bpmnElement="Flow_2">
+        <di:waypoint x="270" y="200" />
+        <di:waypoint x="310" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_3_di" bpmnElement="Flow_3">
+        <di:waypoint x="410" y="200" />
+        <di:waypoint x="455" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_4_di" bpmnElement="Flow_4">
+        <di:waypoint x="480" y="175" />
+        <di:waypoint x="480" y="80" />
+        <di:waypoint x="540" y="80" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_5_di" bpmnElement="Flow_5">
+        <di:waypoint x="640" y="80" />
+        <di:waypoint x="690" y="80" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_6_di" bpmnElement="Flow_6">
+        <di:waypoint x="790" y="80" />
+        <di:waypoint x="870" y="80" />
+        <di:waypoint x="870" y="175" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_7_di" bpmnElement="Flow_7">
+        <di:waypoint x="505" y="200" />
+        <di:waypoint x="615" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_8_di" bpmnElement="Flow_8">
+        <di:waypoint x="715" y="200" />
+        <di:waypoint x="845" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_9_di" bpmnElement="Flow_9">
+        <di:waypoint x="480" y="225" />
+        <di:waypoint x="480" y="320" />
+        <di:waypoint x="615" y="320" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_10_di" bpmnElement="Flow_10">
+        <di:waypoint x="715" y="320" />
+        <di:waypoint x="870" y="320" />
+        <di:waypoint x="870" y="225" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_11_di" bpmnElement="Flow_11">
+        <di:waypoint x="895" y="200" />
+        <di:waypoint x="935" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_12_di" bpmnElement="Flow_12">
+        <di:waypoint x="960" y="175" />
+        <di:waypoint x="960" y="100" />
+        <di:waypoint x="1030" y="100" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="966" y="80" width="58" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_13_di" bpmnElement="Flow_13">
+        <di:waypoint x="1130" y="100" />
+        <di:waypoint x="1360" y="100" />
+        <di:waypoint x="1360" y="175" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_14_di" bpmnElement="Flow_14">
+        <di:waypoint x="960" y="225" />
+        <di:waypoint x="960" y="300" />
+        <di:waypoint x="1030" y="300" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="966" y="305" width="58" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_15_di" bpmnElement="Flow_15">
+        <di:waypoint x="1130" y="300" />
+        <di:waypoint x="1180" y="300" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_16_di" bpmnElement="Flow_16">
+        <di:waypoint x="1280" y="300" />
+        <di:waypoint x="1360" y="300" />
+        <di:waypoint x="1360" y="225" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_17_di" bpmnElement="Flow_17">
+        <di:waypoint x="1385" y="200" />
+        <di:waypoint x="1427" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_18_di" bpmnElement="Flow_18">
+        <di:waypoint x="1463" y="200" />
+        <di:waypoint x="1500" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_19_di" bpmnElement="Flow_19">
+        <di:waypoint x="1600" y="200" />
+        <di:waypoint x="1652" y="200" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
