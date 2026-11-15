@@ -2,7 +2,7 @@
 
 Design-time analysis of time rules in BPMN processes.
 
-TimeLens reads a BPMN 2.0 model and a side file of time rules: task durations, gaps between tasks, lags and deadlines. Some durations are **contingent**: the organization does not control them (for example, how long a customer takes to upload documents). TimeLens decides if every case can always meet its rules (**dynamic controllability**, DC). If not, it explains the conflict in business words and computes the cheapest repair with business levers.
+TimeLens reads a BPMN 2.0 model and a side file of time rules: task durations, gaps between the tasks, lags and deadlines. Some durations are **contingent**: the organization does not control them (for example, how long a customer takes to upload documents). TimeLens decides if every case can always meet its rules (**dynamic controllability**, DC). If not, it explains the conflict in business words and computes the cheapest repair with business levers.
 
 ```
  Event log (BPI 2017)          BPMN model + time rules (JSON)
