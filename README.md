@@ -1,6 +1,6 @@
 # TimeLens
 
-Design-time analysis of time rules in BPMN processes.
+Design-time analysis of time rules in these BPMN processes.
 
 TimeLens reads a BPMN 2.0 model and a side file of time rules: task durations, gaps between tasks, lags and deadlines. Some durations are **contingent**: the organization does not control them (for example, how long a customer takes to upload documents). TimeLens decides if every case can always meet its rules (**dynamic controllability**, DC). If not, it explains the conflict in business words and computes the cheapest repair with business levers.
 
@@ -235,7 +235,7 @@ Alert replay on the repaired alpha 0.95 rules (`results/alerts_eval.md`). It use
 
 **TimeLens alerts do not beat the static rule on this model.** The minimum-cost repair leaves almost no slack (the latest safe start of "Complete application" is minutes after case creation), and the monitor assumes every pending contingent duration takes its repaired maximum, which is tighter than history. So 5,558 of 6,554 cases alert, most of them at once. Waits are not the cause: between the mapped events the log has almost none (`O_Sent` and the end of "Complete application" share a second), and a contingent wait from creation to the start of completion lowered precision to 0.042. Keeping slack in the repair (`repair --margin`, not yet measured on this log), or a monitor that uses observed duration quantiles instead of maxima, are open options.
 
-Calibration splits cases by start time: the first 70 % train, the last 30 % test. Only contingent tasks are calibrated; controllable ranges stay as the template sets them. A task with fewer than 30 samples is not calibrated (warning). A mapped task that is not in the template, or a model task without a mapping in `alerts-eval`, is an input error. Range at coverage alpha: floor of the `(1 - alpha) / 2` quantile to ceil of the `1 - (1 - alpha) / 2` quantile. Risk is `1 - empirical joint coverage` on the test set (no independence formula).
+Calibration train and test splits cases by start time: the first 70 % train, the last 30 % test. Only contingent tasks are calibrated; controllable ranges stay as the template sets them. A task with fewer than 30 samples is not calibrated (warning). A mapped task that is not in the template, or a model task without a mapping in `alerts-eval`, is an input error. Range at coverage alpha: floor of the `(1 - alpha) / 2` quantile to ceil of the `1 - (1 - alpha) / 2` quantile. Risk is `1 - empirical joint coverage` on the test set (no independence formula).
 
 ## Assumptions
 
@@ -284,7 +284,7 @@ src/timelens/
   stnu/            STNU, BPMN -> STNU mapping, STN tools, SC, DC
   analysis/        verdicts, schedule, conflicts, repair, frontier, alerts
   mining/          event log loading, mapping, calibration
-  bench/           random process generator and timing benchmark
+  bench/           random process generator and timing benchmark made
   report/          report text and plots
   ui/              Streamlit web UI: pages and file pickers
   workflow.py      steps shared by the CLI and the UI
